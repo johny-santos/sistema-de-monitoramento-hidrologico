@@ -13,6 +13,11 @@ class StationSerializer(serializers.ModelSerializer):
 
 
 class ObservationSerializer(serializers.ModelSerializer):
+    station_id = serializers.PrimaryKeyRelatedField(
+        source='station',
+        queryset=Station.objects.all()
+    )
+
     class Meta:
         model = Observation
         fields = [
