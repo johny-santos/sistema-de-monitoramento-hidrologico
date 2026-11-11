@@ -1,7 +1,6 @@
 from django.contrib import admin
-
 from .models import Station, Observation
-
+from rest_framework.authtoken.models import Token
 
 @admin.register(Station)
 class StationAdmin(admin.ModelAdmin):
@@ -14,3 +13,5 @@ class ObservationAdmin(admin.ModelAdmin):
     list_display = ['station', 'metric', 'observed_at', 'value', 'unit', 'source']
     list_filter = ['metric', 'source']
     date_hierarchy = 'observed_at'
+
+admin.site.register(Token)
