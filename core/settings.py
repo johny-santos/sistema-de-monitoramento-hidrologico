@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import inspect
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +42,8 @@ INSTALLED_APPS = [
     'django_filters',
     'monitoring',
     'rest_framework.authtoken',
-    #'drf_spectacular',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 ]
 
 MIDDLEWARE = [
@@ -146,4 +148,49 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API de Monitoramento Hidrológico',
+    'DESCRIPTION': inspect.cleandoc("""
+    ## Bem-vindos à API de Monitoramento Hidrológico!
+
+    ### Nessa API, você consegue gerir estações:
+    - **Listar estações** (`GET /api/stations/`) sem autenticação
+    - **Criar estações** (`POST /api/stations/`) com autenticação
+    - **Atualizar estações** (`PUT /api/stations/{id}/`) com autenticação
+    - **Excluir estações** (`DELETE /api/stations/{id}/`) com autenticação
+
+    > **Nota de Permissão:** Qualquer usuário autenticado pode criar, atualizar ou excluir registros usando seu Token
+
+    ### Autenticação
+    Use o endpoint `/api/token/` para obter sua chave e inclua no cabeçalho (ou clique no botão **Authorize** abaixo):
+    ```
+    Authorization: Token <sua_chave>
+    ```
+
+    ---
+
+    ### Consulta de Observações Geológicas:
+    - **Listar observações** (`GET /api/observations/`) sem autenticação
+    - **Criar observações** (`POST /api/observations/`) com autenticação
+    - **Atualizar observações** (`PUT /api/observations/{id}/`) com autenticação
+    - **Excluir observações** (`DELETE /api/observations/{id}/`) com autenticação
+
+    > **Nota de Permissão:** Qualquer usuário autenticado pode criar, atualizar ou excluir registros usando seu Token
+    """),
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+
