@@ -1,4 +1,5 @@
 Django
 django-filter
 djangorestframework
-# drf-spectacular
+drf-spectacular
+drf-spectacular-sidecar
