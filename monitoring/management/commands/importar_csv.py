@@ -15,7 +15,7 @@ class Command(BaseCommand):
     help = 'Importa estações e observações a partir de um arquivo CSV.'
 
     def handle(self, *args, **options):
-        caminho_csv = Path(settings.BASE_DIR) / 'dados_estacoes_excel.csv'
+        caminho_csv = Path(settings.BASE_DIR) / 'observations.csv'
 
         if not caminho_csv.exists():
             raise CommandError(f'Arquivo não encontrado: {caminho_csv}')

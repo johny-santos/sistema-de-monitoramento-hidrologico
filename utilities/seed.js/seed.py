@@ -1,6 +1,5 @@
 import math
-import os
-import pandas as pd
+import csv
 import time
 from datetime import datetime, timezone
 
@@ -11,7 +10,7 @@ stations = [
     {"id": "EST-03", "name": "Estação Campo Alto", "river": "Rio do Campo", "municipality": "Campo Alto"}
 ]
 
-output_file = "dados_estacoes_excel.csv"
+output_file = "observations.csv"
 
 # Arredonda para a hora atual em milissegundos
 end_hour = math.floor(time.time() * 1000 / 3600000) * 3600000
@@ -53,11 +52,11 @@ for index in range(73):
             "source": "synthetic"
         })
 
-df = pd.DataFrame(dados_lista)
-
-# AS DUAS MUDANÇAS CRUCIAIS:
-# sep=";" separa as colunas direto no Excel nacional
-# encoding="utf-8-sig" adiciona o marcador BOM para o Excel ler acentos sem erro
-df.to_csv(output_file, index=False, sep=";", encoding="utf-8-sig")
+# delimiter=";" separa as colunas direto no Excel nacional
+# utf-8-sig adiciona o marcador BOM para o Excel ler acentos sem erro
+with open(output_file, "w", encoding="utf-8-sig", newline="") as arquivo:
+    writer = csv.DictWriter(arquivo, fieldnames=dados_lista[0].keys(), delimiter=";")
+    writer.writeheader()
+    writer.writerows(dados_lista)
 
 print(f"Sucesso! Arquivo '{output_file}' gerado sob medida para o Excel.")

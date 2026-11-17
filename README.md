@@ -57,7 +57,7 @@ O script `seed.js` do desafio foi **adaptado para Python puro** (`seed.py`) e ge
 sistema-de-monitoramento-hidrologico/
 ├── manage.py
 ├── db.sqlite3                    # Banco SQLite local
-├── dados_estacoes_excel.csv      # Dados gerados pelo seed
+├── observations.csv              # Dados gerados pelo seed
 │
 ├── core/                         # Configuração do projeto Django
 │   ├── settings.py
@@ -154,13 +154,14 @@ A API ficará em **http://127.0.0.1:8000/**.
 
 ## Dados de demonstração (seed)
 
-O `seed.js` original foi adaptado para Python em `utilities/seed.js/seed.py`. Ele gera as **estações fictícias** e suas **observações sintéticas** (horários em ISO 8601 / UTC) e exporta tudo para um arquivo **CSV**.
+O `seed.js` original foi adaptado para Python em `utilities/seed.js/seed.py`. Ele gera as **estações fictícias** e suas **observações sintéticas** (horários em ISO 8601 / UTC) e exporta tudo para o arquivo **`observations.csv`** (separador `;`, UTF-8 com BOM), usando apenas a biblioteca padrão do Python (sem pandas). Rode na pasta do `manage.py`:
 
 ```bash
 python utilities/seed.js/seed.py
+python manage.py importar_csv
 ```
 
-> 📝 **CONFIRMAR:** nome e local do CSV gerado (hoje há `dados_estacoes_excel.csv` na raiz; o desafio pede `observations.csv`) e o comando que carrega o CSV no banco, por exemplo: `python manage.py <nome_do_comando>` (arquivo em `monitoring/management/commands/`).
+O primeiro comando gera o CSV com as últimas 72 horas (a partir da hora atual) e o segundo carrega estações e observações no banco (`monitoring/management/commands/importar_csv.py`). Rodar de novo atualiza os registros existentes, sem duplicar.
 
 As leituras ausentes (lacunas) **não são inventadas**: ficam como valor nulo.
 
@@ -193,9 +194,9 @@ O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
 | Método | Rota | Descrição |
 |---|---|---|
 | `GET` | `/api/stations` | Lista as estações |
-| `GET` | `/api/stations/{id}/summary` | Local e últimas leituras da estação |
-| `GET` | `/api/stations/{id}/series?metric=level&hours=24` | Histórico de nível (m) |
-| `GET` | `/api/stations/{id}/series?metric=rain&hours=24` | Histórico de chuva (mm/h) |
+| `GET` | `/api/stations/{id}/summary/` | Local e últimas leituras da estação |
+| `GET` | `/api/stations/{id}/series/?metric=level&hours=24` | Histórico de nível (m) |
+| `GET` | `/api/stations/{id}/series/?metric=rain&hours=24` | Histórico de chuva (mm/h) |
 
 **Parâmetros de `series`:**
 
@@ -204,17 +205,18 @@ O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
 | `metric` | Sim | `level` ou `rain` | — |
 | `hours` | Não | inteiro de 1 a 72 | 24 |
 
-**Exemplo de resposta** (`/api/stations/1/series?metric=level&hours=24`):
+**Exemplo de resposta** (`/api/stations/EST-01/series/?metric=level&hours=24`):
 
 ```json
 {
   "simulated": true,
-  "station_id": 1,
+  "station": "EST-01",
   "metric": "level",
-  "unit": "m",
   "hours": 24,
+  "unit": "m",
+  "count": 1,
   "points": [
-    { "observed_at": "2026-01-01T13:00:00Z", "value": 2.35 }
+    { "observed_at": "2026-01-01T13:00:00Z", "value": 1.04, "unit": "m" }
   ]
 }
 ```
@@ -226,7 +228,6 @@ O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
 | `400` | `metric` ausente/inválida ou `hours` fora de 1–72 |
 | `404` | Estação inexistente |
 
-> 📝 **CONFIRMAR:** prefixo das rotas, nomes dos campos e formato dos erros, comparando com `monitoring/urls.py`, `views.py` e `serializers.py`.
 
 ---
 
@@ -237,7 +238,8 @@ O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
 - **Janela:** `hours` entre 1 e 72.
 - **Ordenação:** séries em ordem cronológica crescente.
 - **Lacunas:** leituras ausentes não são preenchidas nem interpoladas.
-- **Transparência:** toda resposta identifica a amostra como simulada.
+- **Transparência:** estações, observações, `summary` e `series` trazem o campo `"simulated": true`.
+- **Janela de `series`:** é contada a partir da última leitura da estação, não da hora atual.
 - **Consultas seguras:** acesso ao banco via ORM do Django (consultas parametrizadas).
 
 ---

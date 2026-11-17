@@ -35,7 +35,7 @@ class StationViewSet(viewsets.ModelViewSet):
         summary='Série temporal de uma métrica',
         parameters=[
             OpenApiParameter('metric', str, enum=['level', 'rain'], required=True),
-            OpenApiParameter('hours', int, description='Janela em horas (1-720, padrão 24), contada a partir da última leitura'),
+            OpenApiParameter('hours', int, description='Janela em horas (1-72, padrão 24), contada a partir da última leitura'),
         ],
     )
     @action(detail=True, methods=['get'])
@@ -48,8 +48,8 @@ class StationViewSet(viewsets.ModelViewSet):
             hours = int(request.query_params.get('hours', 24))
         except ValueError:
             raise ValidationError({'hours': 'Deve ser um inteiro.'})
-        if not 1 <= hours <= 720:
-            raise ValidationError({'hours': 'Deve estar entre 1 e 720.'})
+        if not 1 <= hours <= 72:
+            raise ValidationError({'hours': 'Deve estar entre 1 e 72.'})
 
         qs = station.observations.filter(metric=metric)
         last = qs.order_by('-observed_at').first()
@@ -62,6 +62,7 @@ class StationViewSet(viewsets.ModelViewSet):
                 .values('observed_at', 'value', 'unit')
             )
         return Response({
+            'simulated': True,
             'station': station.id,
             'metric': metric,
             'hours': hours,
