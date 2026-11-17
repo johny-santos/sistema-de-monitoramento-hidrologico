@@ -1,279 +1,179 @@
-# 🌊 Sistema de Monitoramento Hidrológico — API (Backend)
+Sistema de Monitoramento Hidrológico
+API REST em Python e Django para consultar estações fictícias e acompanhar leituras de nível da água e chuva. Desenvolvida para a trilha backend do Desafio de Monitoramento Hidrológico da Cogmo Technology, com SQLite para armazenamento local.
+Os dados são sintéticos e servem para demonstração. Use-os apenas no contexto do exercício.
 
-API REST em **Python + Django** que simula o monitoramento de rios e lagos em **estações fictícias**, expondo leituras de **nível da água** e **chuva** ao longo do tempo. Desenvolvida como resposta ao *Desafio de Monitoramento Hidrológico* da **Cogmo Technology** (trilha **backend**).
+Sumário
+- Tecnologias
+- Estrutura do projeto
+- Como executar
+- Dados de demonstração
+- Documentação da API
+- Autenticação e permissões
+- Modelo de dados
+- Validação local
+- Correspondência com o desafio
+- Equipe
+Tecnologias
+Tecnologia	Uso
+Python 3.12	Ambiente de desenvolvimento documentado
+Django	Configuração da aplicação, ORM, migrações e painel administrativo
+Django REST Framework	API REST, autenticação e paginação
+django-filter	Filtros de estações e observações
+drf-spectacular e Sidecar	OpenAPI, Swagger UI e ReDoc
+SQLite	Banco local da aplicação
+pandas	Geração opcional do CSV pelo script de demonstração
 
-> ⚠️ **Dados simulados.** Todas as estações e observações são sintéticas. Elas **não representam rios reais** e **não devem** ser usadas para alertas ou decisões de segurança.
 
-## Sumário
+As dependências da aplicação estão listadas em [requirements.txt](utilities/requirements.txt).
+Estrutura do projeto
 
-1. [Sobre o projeto](#sobre-o-projeto)
-2. [Tecnologias](#tecnologias)
-3. [Estrutura do projeto](#estrutura-do-projeto)
-4. [Como executar](#como-executar)
-5. [Dados de demonstração (seed)](#dados-de-demonstração-seed)
-6. [Autenticação de Admin](#autenticação-de-admin)
-7. [Documentação da API](#documentação-da-api)
-8. [Endpoints](#endpoints)
-9. [Regras de negócio](#regras-de-negócio)
-10. [Modelo de dados (MER + DER)](#modelo-de-dados-mer--der)
-11. [Testes](#testes)
-12. [Equipe](#equipe)
-
----
-
-## Sobre o projeto
-
-O desafio original foi proposto em Node.js/Express/SQLite; nesta versão ele foi realizado em **Python + Django**. A API:
-
-- lista as estações disponíveis;
-- retorna o resumo de uma estação (local e últimas leituras);
-- retorna a série histórica de **nível (m)** ou **chuva (mm/h)** em uma janela de 1 a 72 horas;
-- valida os parâmetros e responde com erros HTTP claros;
-- é documentada automaticamente com **drf-spectacular** (Swagger/Redoc).
-
-O script `seed.js` do desafio foi **adaptado para Python puro** (`seed.py`) e gera os dados sintéticos em **CSV**.
-
-**Fora do escopo:** previsão por IA, sensores reais, alertas de risco, deploy e infraestrutura. O frontend (React) é uma trilha independente, feita por outra equipe.
-
----
-
-## Tecnologias
-
-| Tecnologia | Uso |
-|---|---|
-| Python 3.12 | Linguagem |
-| Django | Framework web, ORM e migrações |
-| Django REST Framework | Construção da API |
-| drf-spectacular | Schema OpenAPI, Swagger UI e Redoc |
-| SQLite | Banco de dados local (`db.sqlite3`) |
-
-> As versões exatas das dependências estão em `utilities/requirements.txt`.
-
----
-
-## Estrutura do projeto
-
-```text
 sistema-de-monitoramento-hidrologico/
 ├── manage.py
-├── db.sqlite3                    # Banco SQLite local
-├── dados_estacoes_excel.csv      # Dados gerados pelo seed
-│
-├── core/                         # Configuração do projeto Django
+├── dados_estacoes_excel.csv
+├── core/
 │   ├── settings.py
-│   ├── urls.py                   # Rotas principais
-│   ├── asgi.py
-│   └── wsgi.py
-│
-├── monitoring/                   # App principal da API
-│   ├── models.py                 # Modelos (tabelas)
-│   ├── serializers.py            # Conversão modelo <-> JSON
-│   ├── views.py                  # Endpoints
-│   ├── urls.py                   # Rotas da app
-│   ├── admin.py                  # Painel administrativo
-│   ├── tests.py                  # Testes
-│   ├── management/commands/      # Comandos personalizados do manage.py
-│   └── migrations/               # Scripts de migração
-│
-├── docs/
-│   └── img/                      # Imagens do MER e do DER
-│
+│   └── urls.py
+├── monitoring/
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── tests.py
+│   ├── migrations/
+│   └── management/commands/importar_csv.py
 └── utilities/
-    ├── requirements.txt          # Dependências
-    └── seed.js/                  # Seed adaptado para Python
-        └── seed.py
-```
+    ├── requirements.txt
+    └── seed.js/seed.py
 
----
-
-## Como executar
-
-### Pré-requisitos
-
-- **Python 3.12** (`python --version`)
-- **Git** (`git --version`)
-
-Não é necessária nenhuma chave de API, senha ou serviço externo.
-
-### 1. Clonar o repositório
-
-```bash
+    O arquivo db.sqlite3 é o banco local utilizado pelo Django. As migrações criam as tabelas e o comando de importação popula os dados de demonstração.
+Como executar
+1. Clonar o repositório
+Tenha o Git e o Python instalados. Execute os comandos na pasta que contém o manage.py a partir do passo 2.
 git clone https://github.com/johny-santos/sistema-de-monitoramento-hidrologico.git
 cd sistema-de-monitoramento-hidrologico
-```
-
-### 2. Criar e ativar o ambiente virtual
-
-**Windows (PowerShell):**
-
-```powershell
-python -m venv venv
-venv\Scripts\Activate.ps1
-```
-
-> Se o PowerShell bloquear o script: `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
-
-**Linux / macOS:**
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Instalar as dependências
-
-```bash
-pip install -r utilities/requirements.txt
-```
-
-### 4. Aplicar as migrações
-
-```bash
+2. Criar e ativar o ambiente virtual
+Windows PowerShell
+python -m venv venv_windows
+.\venv_windows\Scripts\Activate.ps1
+Linux ou macOS
+python3 -m venv .venv
+source .venv/bin/activate
+3. Instalar, preparar o banco e iniciar o servidor
+python -m pip install -r utilities/requirements.txt
+python manage.py check
 python manage.py migrate
-```
-
-### 5. Carregar os dados de demonstração
-
-Veja [Dados de demonstração (seed)](#dados-de-demonstração-seed).
-
-### 6. Criar um usuário administrador
-
-```bash
-python manage.py createsuperuser
-```
-
-### 7. Iniciar o servidor
-
-```bash
+python manage.py importar_csv
 python manage.py runserver
-```
+Abra a API e confira os registros na lista de estações.
+Dados de demonstração
+O comando python manage.py importar_csv lê dados_estacoes_excel.csv na raiz do projeto. O arquivo usa ponto e vírgula como separador e UTF-8 com BOM. A importação atualiza ou cria estações pelo identificador e observações pela combinação de estação, métrica e horário. Importar novamente o mesmo CSV atualiza os registros correspondentes.
 
-A API ficará em **http://127.0.0.1:8000/**.
-
----
-
-## Dados de demonstração (seed)
-
-O `seed.js` original foi adaptado para Python em `utilities/seed.js/seed.py`. Ele gera as **estações fictícias** e suas **observações sintéticas** (horários em ISO 8601 / UTC) e exporta tudo para um arquivo **CSV**.
-
-```bash
+Para gerar outro CSV, execute da raiz do projeto. O gerador sobrescreve dados_estacoes_excel.csv e usa pandas, uma dependência adicional para esta etapa.
+python -m pip install pandas
 python utilities/seed.js/seed.py
-```
+python manage.py importar_csv
+Documentação da API
+Interface	Endereço local
+Raiz da API	/api/
+Swagger UI	/api/docs/
+ReDoc	/api/redoc/
+Schema OpenAPI	/api/schema/
+Django Admin	/admin/
 
-> 📝 **CONFIRMAR:** nome e local do CSV gerado (hoje há `dados_estacoes_excel.csv` na raiz; o desafio pede `observations.csv`) e o comando que carrega o CSV no banco, por exemplo: `python manage.py <nome_do_comando>` (arquivo em `monitoring/management/commands/`).
 
-As leituras ausentes (lacunas) **não são inventadas**: ficam como valor nulo.
+Endpoints
+Método	Rota	Uso
+GET	/api/stations/	Listar estações
+GET	/api/stations/{id}/	Consultar uma estação pelo identificador textual, como EST-01
+GET	/api/stations/{id}/summary/	Consultar a localização, o total de observações e a última leitura de cada métrica
+GET	/api/stations/{id}/series/	Consultar a série histórica de uma métrica
+GET	/api/observations/	Listar observações
+GET	/api/observations/{id}/	Consultar uma observação pelo ID numérico
+POST	/api/stations/ ou /api/observations/	Criar um registro com autenticação
+PUT, PATCH, DELETE	Rota de detalhe do recurso	Atualizar ou excluir um registro com autenticação
+POST	/api/token/	Obter um token com usuário e senha do Django
 
----
 
-## Autenticação de Admin
+As duas listagens são paginadas em até 100 registros por página. Estações aceitam filtros por river e municipality, além de search por nome, rio ou município. Observações aceitam station, metric, source, observed_after e observed_before. Use ordering=observed_at para ordenar por horário ou ordering=-value para ordenar por valor decrescente.
+Resumo e série histórica
+Em summary/, o campo latest contém as chaves level e rain. Quando a estação ainda não possui leitura de uma métrica, o valor correspondente é null.
+Parâmetro de series/	Obrigatório	Valores
+metric	Sim	level para nível em metros ou rain para chuva em milímetros por hora
+hours	Não	Inteiro de 1 a 720 na implementação atual, com padrão 24
 
-O projeto possui lógica de autenticação de administrador aplicada às rotas.
 
-> 📝 **CONFIRMAR e preencher:** quais rotas exigem autenticação, como se autenticar (sessão do Django Admin, token, etc.) e um exemplo de requisição autenticada.
+A janela começa hours horas antes da última leitura disponível para a estação e a métrica consultadas. Os pontos são ordenados do mais antigo para o mais recente, com datas em ISO 8601 e UTC. Horários sem observação ficam fora da série. Uma série sem leituras retorna count: 0, points: [] e unit: null.
 
-O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
-
----
-
-## Documentação da API
-
-> 📝 **CONFIRMAR as URLs** em `core/urls.py` (as abaixo são as convenções do drf-spectacular).
-
-| Interface | URL |
-|---|---|
-| Swagger UI | http://127.0.0.1:8000/api/docs/ |
-| Redoc | http://127.0.0.1:8000/api/redoc/ |
-| Schema OpenAPI | http://127.0.0.1:8000/api/schema/ |
-
----
-
-## Endpoints
-
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/api/stations` | Lista as estações |
-| `GET` | `/api/stations/{id}/summary` | Local e últimas leituras da estação |
-| `GET` | `/api/stations/{id}/series?metric=level&hours=24` | Histórico de nível (m) |
-| `GET` | `/api/stations/{id}/series?metric=rain&hours=24` | Histórico de chuva (mm/h) |
-
-**Parâmetros de `series`:**
-
-| Parâmetro | Obrigatório | Valores | Padrão |
-|---|---|---|---|
-| `metric` | Sim | `level` ou `rain` | — |
-| `hours` | Não | inteiro de 1 a 72 | 24 |
-
-**Exemplo de resposta** (`/api/stations/1/series?metric=level&hours=24`):
-
-```json
+Exemplo de consulta para nível da estação EST-01 nas últimas 24 horas da série. O JSON abaixo ilustra o formato com um único ponto.
 {
-  "simulated": true,
-  "station_id": 1,
+  "station": "EST-01",
   "metric": "level",
-  "unit": "m",
   "hours": 24,
+  "unit": "m",
+  "count": 1,
   "points": [
-    { "observed_at": "2026-01-01T13:00:00Z", "value": 2.35 }
+    {
+      "observed_at": "2026-11-01T19:00:00Z",
+      "value": 1.05,
+      "unit": "m"
+    }
   ]
 }
+A série retorna 400 Bad Request para métrica ausente ou inválida e para janelas fora do intervalo aceito. Recursos inexistentes retornam 404 Not Found. As observações importadas têm source: "synthetic". O formato atual de series/ contém apenas os metadados da consulta e os pontos.
+Autenticação e permissões
+As consultas são públicas. Na configuração atual, qualquer usuário autenticado pode criar, atualizar ou excluir pela API. O painel Django Admin exige uma conta com acesso administrativo. Para criar uma conta local para a demonstração, execute:
+python manage.py createsuperuser
+Para obter um token no PowerShell, com o servidor em execução, use a conta que você criou. O exemplo usa a estação EST-01 importada pelo CSV.
+$baseUrl = "http://127.0.0.1:8000"
+$credencial = Get-Credential
+$corpo = @{
+    username = $credencial.UserName
+    password = $credencial.GetNetworkCredential().Password
+} | ConvertTo-Json
+
+$token = (Invoke-RestMethod -Uri "$baseUrl/api/token/" -Method Post `
+    -ContentType "application/json" -Body $corpo).token
+
+$headers = @{ Authorization = "Token $token" }
+Invoke-RestMethod -Uri "$baseUrl/api/stations/EST-01/" -Headers $headers
+No Swagger, use o esquema tokenAuth em Authorize e informe o cabeçalho no formato Token <seu_token>. A API também aceita autenticação pela sessão do Django.
+Modelo de dados
+MER
+Uma estação identifica o local monitorado e pode possuir zero ou muitas observações. Cada observação pertence a exatamente uma estação e registra uma métrica em um horário.
+DER
+```mermaid
+erDiagram
+    STATION ||--o{ OBSERVATION : possui
+    STATION {
+        string id PK
+        string name
+        string river
+        string municipality
+    }
+    OBSERVATION {
+        integer id PK
+        string station_id FK
+        string metric
+        datetime observed_at
+        float value
+        string unit
+        string source
+    }
 ```
-
-**Erros:**
-
-| Status | Quando |
-|---|---|
-| `400` | `metric` ausente/inválida ou `hours` fora de 1–72 |
-| `404` | Estação inexistente |
-
-> 📝 **CONFIRMAR:** prefixo das rotas, nomes dos campos e formato dos erros, comparando com `monitoring/urls.py`, `views.py` e `serializers.py`.
-
----
-
-## Regras de negócio
-
-- **Horários** sempre em UTC, formato ISO 8601.
-- **Unidades:** nível em metros (m); chuva em milímetros por hora (mm/h). Nunca misturadas.
-- **Janela:** `hours` entre 1 e 72.
-- **Ordenação:** séries em ordem cronológica crescente.
-- **Lacunas:** leituras ausentes não são preenchidas nem interpoladas.
-- **Transparência:** toda resposta identifica a amostra como simulada.
-- **Consultas seguras:** acesso ao banco via ORM do Django (consultas parametrizadas).
-
----
-
-## Modelo de dados (MER + DER)
-
-**Resumo:** uma **Estação** possui muitas **Observações** (1:N); cada observação pertence a uma única estação.
-
-### MER (Modelo Entidade-Relacionamento)
-
-![MER do sistema de monitoramento hidrológico](docs/img/mer.png)
-
-### DER (Diagrama Entidade-Relacionamento)
-
-![DER do sistema de monitoramento hidrológico](docs/img/der.png)
-
-> 📝 **CONFIRMAR:** salvar as imagens em `docs/img/mer.png` e `docs/img/der.png` (ou ajustar os caminhos acima) e conferir se os nomes das tabelas e campos nas imagens batem com `monitoring/models.py`.
-
----
-
-## Testes
-
-```bash
-python manage.py test
-```
-
-Os testes estão em `monitoring/tests.py`.
-
----
-
-## Equipe
-
-Grupo responsável pela trilha **backend**:
-
+A combinação station_id, metric e observed_at é única. A exclusão de uma estação remove suas observações em cascata. A definição está em [models.py](monitoring/models.py).
+Validação local
+Depois de executar as migrações e importar o CSV, confira:
+1. GET /api/stations/ retorna estações e GET /api/observations/ retorna leituras.
+2. GET /api/stations/EST-01/summary/ retorna a estação e as últimas leituras.
+3. GET /api/stations/EST-01/series/?metric=rain&hours=24 retorna pontos ordenados em mm/h.
+4. Repetir a consulta com metric=temperatura retorna HTTP 400.
+5. Uma tentativa de escrita sem autenticação retorna HTTP 401 na configuração atual.
+O comando python manage.py test executa a descoberta de testes do Django. O arquivo [tests.py](monitoring/tests.py) ainda é o arquivo inicial e está sem casos automatizados.
+Correspondência com o desafio
+O guia da Cogmo define uma janela de 1 a 72 horas e pede que cada resposta identifique os dados como simulados. Na branch main, a série aceita até 720 horas e algumas respostas, como a listagem de estações e a própria série, ainda não incluem um indicador de simulação. O enunciado da adaptação também pede a geração de observations.csv em Python puro. O gerador atual usa pandas e grava dados_estacoes_excel.csv. Estes pontos precisam de ajuste no código para atender ao enunciado integralmente.
+Equipe
 - Johny Oliveira Santos
 - Ana Luisa Santos de Oliveira
 - Victor Hugo da Silva Sousa
-
-**Desafio proposto por:** Cogmo Technology
+Desafio proposto pela Cogmo Technology.
