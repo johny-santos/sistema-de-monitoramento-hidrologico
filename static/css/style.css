@@ -1,0 +1,266 @@
+
+/* ==============================
+   CONFIGURAÇÕES GERAIS
+============================== */
+
+:root {
+    --primary-color: #2563eb;
+    --sidebar-bg: #102a43;
+    --sidebar-hover: #1d405f;
+    --sidebar-text: #cbd5e1;
+    --background-color: #f4f7fb;
+    --text-color: #243447;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* ==============================
+   ESTRUTURA PRINCIPAL
+============================== */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ==============================
+   SIDEBAR
+============================== */
+.sidebar {
+    --bs-offcanvas-width: 260px;
+    --bs-offcanvas-bg: var(--sidebar-bg);
+    --bs-offcanvas-color: #ffffff !important;
+
+    width: 260px;
+    background-color: var(--sidebar-bg) !important; 
+    color: #ffffff;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 27px 24px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.sidebar-brand i {
+    font-size: 27px;
+    color: #38bdf8;
+}
+
+.sidebar-section-label {
+    padding: 20px 24px 10px;
+    color: #829ab1;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0 12px;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-link i {
+    font-size: 18px;
+}
+
+.sidebar-link:hover {
+    background-color: var(--sidebar-hover);
+    color: white;
+}
+
+.sidebar-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* ==============================
+   RODAPÉ DA SIDEBAR
+============================== */
+
+.sidebar-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 35px 16px 20px;
+    padding: 16px 10px;
+    border-top: 1px solid #29445f;
+}
+
+.sidebar-footer-icon {
+    color: #38bdf8;
+    font-size: 24px;
+}
+
+.sidebar-footer strong,
+.sidebar-footer small {
+    display: block;
+}
+
+.sidebar-footer strong {
+    font-size: 13px;
+}
+
+.sidebar-footer small {
+    margin-top: 3px;
+    color: #829ab1;
+    font-size: 11px;
+}
+
+/* ==============================
+   TOPBAR
+============================== */
+
+.topbar {
+    min-height: 82px;
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: white;
+    border-bottom: 1px solid #e5eaf0;
+}
+
+.topbar-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.topbar-subtitle {
+    color: #829ab1;
+    font-size: 12px;
+}
+
+.sidebar-toggle {
+    font-size: 24px;
+    color: var(--text-color);
+}
+
+/* ==============================
+   CONTEÚDO DAS PÁGINAS
+============================== */
+
+.page-content {
+    padding: 30px;
+}
+
+/* ==============================
+   RESPONSIVIDADE
+============================== */
+
+@media (min-width: 992px) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+        flex: 0 0 260px;
+        height: 100vh;
+    }
+
+    .sidebar .offcanvas-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        height: 100vh;
+    }
+
+    .sidebar-mobile-header {
+        border-bottom: 1px solid #29445f;
+    }
+
+    .page-content {
+        padding: 20px 16px;
+    }
+
+    .topbar {
+        padding: 15px 18px;
+    }
+}
+
+/* ==============================
+   SIDEBAR COLLAPSE
+============================== */
+
+@media (min-width: 992px) {
+
+    .sidebar {
+        transition: width 0.3s ease, flex-basis 0.3s ease;
+        overflow-x: hidden;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar {
+        width: 84px !important;
+        flex-basis: 84px !important;
+    }
+
+    /* Esconde os textos */
+    .app-shell.sidebar-collapsed .sidebar-brand span,
+    .app-shell.sidebar-collapsed .sidebar-section-label,
+    .app-shell.sidebar-collapsed .sidebar-link span,
+    .app-shell.sidebar-collapsed .sidebar-footer > div:not(.sidebar-footer-icon) {
+        display: none;
+    }
+
+    /* Centraliza a marca */
+    .app-shell.sidebar-collapsed .sidebar-brand {
+        justify-content: center;
+        padding: 27px 0;
+    }
+
+    /* Centraliza os ícones dos links */
+    .app-shell.sidebar-collapsed .sidebar-link {
+        justify-content: center;
+        padding: 14px 0;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar-link i {
+        font-size: 21px;
+    }
+
+    /* Rodapé */
+    .app-shell.sidebar-collapsed .sidebar-footer {
+        justify-content: center;
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+}

@@ -1,0 +1,140 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Monitoramento Hidrológico{% endblock %}</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-5.3.9-dist/css/bootstrap.min.css' %}">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons-1.13.2/bootstrap-icons.min.css' %}">
+    
+    <!-- CSS próprio -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-shell">
+
+        <!-- SIDEBAR -->
+        <aside class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" id="appSidebar">
+
+            <!-- Cabeçalho mobile -->
+            <div class="offcanvas-header sidebar-mobile-header">
+                <div class="sidebar-brand">
+                    <i class="bi bi-water"></i>
+                    <span>HydroNexo</span>
+                </div>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#appSidebar"></button>
+            </div>
+
+            <!-- Conteúdo da navegação -->
+            <div class="offcanvas-body p-0">
+
+                <!-- Identidade -->
+                <div class="sidebar-brand d-none d-lg-flex">
+                    <i class="bi bi-water"></i>
+                    <span>HydroNexo</span>
+                </div>
+
+                <div class="sidebar-section-label">
+                    MENU PRINCIPAL
+                </div>
+
+                <nav class="sidebar-nav">
+
+                    <a href="{% url 'dashboard' %}"
+                       class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="bi bi-grid"></i>
+                        <span><b>Dashboard</b></span>
+                    </a>
+
+                    <a href="{% url 'stations' %}"
+                       class="sidebar-link {% if request.resolver_match.url_name == 'stations' or request.resolver_match.url_name == 'station_detail' %}active{% endif %}">
+                        <i class="bi bi-geo-alt"></i>
+                        <span><b>Estações</b></span>
+                    </a>
+
+                </nav>
+
+                <div class="sidebar-section-label">
+                    INFORMAÇÕES
+                </div>
+
+                <nav class="sidebar-nav">
+
+                    <a href="{% url 'about' %}"
+                       class="sidebar-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                        <i class="bi bi-info-circle"></i>
+                        <span><b>Sobre o projeto</b></span>
+                    </a>
+
+                    <a href="https://github.com/johny-santos/sistema-de-monitoramento-hidrologico" target="_blank" rel="noopener noreferrer" class="sidebar-link">
+                        <i class="bi bi-github"></i>
+                        <span><b>Repositório GitHub</b></span>
+                    </a>
+                </nav>
+
+                <!-- Rodapé -->
+                <div class="sidebar-footer">
+                    <div class="sidebar-footer-icon">
+                        <i class="bi bi-water"></i>
+                    </div>
+
+                    <div>
+                        <strong>HydroNexo</strong>
+                        <small>Sistema demonstrativo</small>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- ÁREA PRINCIPAL -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Botão mobile -->
+                    <button class="btn sidebar-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <button class="btn sidebar-toggle d-none d-lg-inline-flex" type="button" id="sidebarCollapse" aria-label="Recolher menu lateral" aria-expanded="true" aria-controls="appSidebar">
+                        <i class="bi bi-layout-sidebar-inset"></i>
+                    </button>
+
+                    <div>
+                        <h5 class="topbar-title">
+                            {% block page_heading %}{% endblock %}
+                        </h5>
+
+                        <small class="topbar-subtitle">
+                            Sistema de Monitoramento Hidrológico
+                        </small>
+                    </div>
+
+                </div>
+
+            </header>
+
+            <section class="page-content">
+                {% block content %}
+                {% endblock %}
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="{% static 'css/bootstrap-5.3.9-dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/sidebar.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>
