@@ -1,0 +1,24 @@
+# Ambientes virtuais e dependencias
+venv/
+.venv/
+node_modules/
+
+# Gerados
+__pycache__/
+*.pyc
+frontend/dist/
+frontend/test-results/
+staticfiles/
+.pytest_cache/
+
+# Banco local (tem usuarios, hashes de senha e tokens): gere com `iniciar.bat dados`
+db.sqlite3
+*.sqlite3-journal
+
+# Locais
+.env
+*.log
+.DS_Store
+Thumbs.db
+.claude/settings.local.json
+.claude/

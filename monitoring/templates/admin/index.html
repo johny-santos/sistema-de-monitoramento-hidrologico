@@ -1,0 +1,22 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block content %}
+{% if hm_stats %}
+<section class="hm-stats" aria-label="Resumo do sistema">
+  <div class="hm-stat">
+    <span>Estações</span><b>{{ hm_stats.stations }}</b><small>{{ hm_stats.stations_with_data }} com leituras</small>
+  </div>
+  <div class="hm-stat">
+    <span>Observações</span><b>{{ hm_stats.observations }}</b><small>{{ hm_stats.level }} de nível · {{ hm_stats.rain }} de chuva</small>
+  </div>
+  <div class="hm-stat">
+    <span>Leitura mais recente</span><b class="sm">{% if hm_stats.latest %}{{ hm_stats.latest|date:"d/m/Y H:i" }} UTC{% else %}—{% endif %}</b><small>dados simulados</small>
+  </div>
+  <div class="hm-stat">
+    <span>Tokens de acesso</span><b>{{ hm_stats.tokens }}</b><small>usuários com API liberada</small>
+  </div>
+</section>
+{% endif %}
+{{ block.super }}
+{% endblock %}

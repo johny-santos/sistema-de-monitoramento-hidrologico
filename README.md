@@ -144,11 +144,20 @@ python manage.py createsuperuser
 
 ### 7. Iniciar o servidor
 
+**Atalho (Windows):** dê dois cliques em `iniciar.bat`. Ele acha o Python, instala o que faltar, prepara o banco, sobe o servidor e abre o navegador. Use `iniciar.bat dados` para gerar dados novos (o `db.sqlite3` não vai para o GitHub: na primeira vez rode com `dados`). O roteiro de apresentação está em `APRESENTACAO.md`.
+
+Ou manualmente:
+
 ```bash
 python manage.py runserver
 ```
 
-A API ficará em **http://127.0.0.1:8000/**.
+O mesmo comando também compila e serve o **frontend** (React): abra **http://127.0.0.1:8000/**.
+A API fica em `/api/`. Precisa de Node.js instalado; o `runserver` roda `npm install` e `npm run build` sozinho quando necessário
+(use `--skip-frontend` para pular). Para desenvolver o frontend com recarga automática: `cd frontend && npm run dev`.
+
+**Desempenho do 3D:** o seletor **Leve · Alto · Off** (no card "Vale 3D") controla o custo gráfico. O padrão é *Leve* (cena estática);
+*Alto* anima a cena e volta sozinho ao *Leve* se o computador não acompanhar. Na dúvida, use *Off* (versão 2D).
 
 ---
 
@@ -169,17 +178,24 @@ As leituras ausentes (lacunas) **não são inventadas**: ficam como valor nulo.
 
 ## Autenticação de Admin
 
-O projeto possui lógica de autenticação de administrador aplicada às rotas.
+- **Leitura é pública** (`GET`): estações, resumo, séries e observações.
+- **Escrita exige token** (`POST`, `PUT`, `PATCH`, `DELETE` em `/api/stations/` e `/api/observations/`): sem token a API responde `401`.
+- Obtenha o token com seu usuário (o mesmo do `createsuperuser`):
 
-> 📝 **CONFIRMAR e preencher:** quais rotas exigem autenticação, como se autenticar (sessão do Django Admin, token, etc.) e um exemplo de requisição autenticada.
+```bash
+curl -X POST http://127.0.0.1:8000/api/token/ -H "Content-Type: application/json" -d '{"username":"admin","password":"sua-senha"}'
+# {"token": "abc123..."}
 
-O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
+curl -X POST http://127.0.0.1:8000/api/observations/ \
+  -H "Authorization: Token abc123..." -H "Content-Type: application/json" \
+  -d '{"station_id":"EST-01","metric":"level","observed_at":"2026-11-05T12:00:00Z","value":1.2,"unit":"m","source":"manual"}'
+```
+
+No site, use o botão de entrar na barra lateral. O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
 
 ---
 
 ## Documentação da API
-
-> 📝 **CONFIRMAR as URLs** em `core/urls.py` (as abaixo são as convenções do drf-spectacular).
 
 | Interface | URL |
 |---|---|
@@ -263,10 +279,16 @@ O painel administrativo do Django fica em **http://127.0.0.1:8000/admin/**.
 ## Testes
 
 ```bash
-python manage.py test
+python manage.py test          # 44 testes de backend: rotas x métodos, filtros, permissões, Admin, rotas do React
+cd frontend && npm run e2e     # fumaça no navegador (24 verificações)
+node e2e/deep.mjs              # auditoria profunda (130 verificações); veja frontend/e2e/README.md
 ```
 
-Os testes estão em `monitoring/tests.py`.
+Os testes do backend estão em `monitoring/tests.py` e `monitoring/test_routes.py`.
+O esquema OpenAPI é validado com `python manage.py spectacular --validate --fail-on-warn`.
+
+> Antes de publicar: `DEBUG = True`, a `SECRET_KEY` fixa e `ALLOWED_HOSTS = []` em `core/settings.py` são só para desenvolvimento.
+> O `runserver` também não é servidor de produção (use gunicorn/uvicorn atrás de um proxy).
 
 ---
 
@@ -274,8 +296,8 @@ Os testes estão em `monitoring/tests.py`.
 
 Grupo responsável pela trilha **backend**:
 
-- Johny Oliveira Santos
-- Ana Luisa Santos de Oliveira
-- Victor Hugo da Silva Sousa
+- [Johny Oliveira Santos](https://github.com/johny-santos)
+- [Ana Luisa Santos de Oliveira](https://github.com/Nalu006)
+- [Victor Hugo da Silva Sousa](https://github.com/VictorHugodaSilvaSousa)
 
 **Desafio proposto por:** Cogmo Technology

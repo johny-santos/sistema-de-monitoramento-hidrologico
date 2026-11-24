@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | HidroMonitor{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="icon" href="{% static 'monitoring/favicon.svg' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="{% static 'monitoring/admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<a class="hm-brand" href="{% url 'admin:index' %}">
+  <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hmg" x1="0" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#8fe0ff"/><stop offset=".55" stop-color="#2aa0f2"/><stop offset="1" stop-color="#0b5ac2"/></linearGradient></defs><path d="M32 3C32 3 11 26 11 41a21 21 0 0 0 42 0C53 26 32 3 32 3z" fill="url(#hmg)"/><path d="M17 44c5-4 10 4 15 0s10 4 15 0" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" opacity=".92"/></svg>
+  <span><b>HidroMonitor</b><small>Painel administrativo</small></span>
+</a>
+{% if user.is_anonymous %}{% include "admin/color_theme_toggle.html" %}{% endif %}
+{% endblock %}
+
+{% block nav-global %}
+<nav class="hm-links" aria-label="Atalhos">
+  <a href="/">Site</a>
+  <a href="/api/docs/">Swagger UI</a>
+  <a href="/api/redoc/">Redoc</a>
+  <a href="/api/">API</a>
+</nav>
+{% endblock %}

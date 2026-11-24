@@ -21,17 +21,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@ogxq^xcf&z6v^6fx2n%rmg_9pqr4enq#4mrw&59(gqal&mgu^'
+import os
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Em produção defina as variáveis de ambiente DJANGO_SECRET_KEY, DJANGO_DEBUG=0 e DJANGO_ALLOWED_HOSTS.
+# Sem elas, valem os padrões de desenvolvimento (iniciar.bat continua funcionando).
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-@ogxq^xcf&z6v^6fx2n%rmg_9pqr4enq#4mrw&59(gqal&mgu^',
+)
 
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') != '0'
+
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h.strip()]
+
+if not DEBUG:
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Fica antes de 'staticfiles' para o nosso `runserver` (build do frontend) ter prioridade.
+    'monitoring',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'monitoring',
     'rest_framework.authtoken',
     'drf_spectacular',
     'drf_spectacular_sidecar',
@@ -48,6 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',  # comprime JS/CSS/JSON (site e API bem mais leves)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -109,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'UTC'
 
@@ -127,11 +140,7 @@ STATIC_URL = 'static/'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -146,6 +155,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_THROTTLE_RATES': {'login': '10/min'},  # só o login é limitado (ScopedRateThrottle)
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -156,38 +166,81 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'API de Monitoramento Hidrológico',
     'DESCRIPTION': inspect.cleandoc("""
-    ## Bem-vindos à API de Monitoramento Hidrológico!
+    API REST do **HidroMonitor**: estações de medição e leituras de **nível do rio (m)** e **chuva (mm/h)**.
 
-    ### Nessa API, você consegue gerir estações:
-    - **Listar estações** (`GET /api/stations/`) sem autenticação
-    - **Criar estações** (`POST /api/stations/`) com autenticação
-    - **Atualizar estações** (`PUT /api/stations/{id}/`) com autenticação
-    - **Excluir estações** (`DELETE /api/stations/{id}/`) com autenticação
+    > ⚠️ **Dados simulados.** Todas as estações e leituras são fictícias e não devem ser usadas em alertas ou decisões de segurança.
 
-    > **Nota de Permissão:** Qualquer usuário autenticado pode criar, atualizar ou excluir registros usando seu Token
-
-    ### Autenticação
-    Use o endpoint `/api/token/` para obter sua chave e inclua no cabeçalho (ou clique no botão **Authorize** abaixo):
+    ## Como começar
+    1. **Leitura é pública.** Basta chamar `GET /api/stations/` ou `GET /api/observations/`.
+    2. **Para escrever** (criar, atualizar, excluir) gere um token em `POST /api/token/` com seu usuário e senha.
+    3. Clique em **Authorize** e informe `Token <sua_chave>`, ou envie o cabeçalho:
     ```
     Authorization: Token <sua_chave>
     ```
 
-    ---
+    ## Rotas principais
+    | Rota | O que faz |
+    |---|---|
+    | `GET /api/stations/` | Lista estações (filtros e busca) |
+    | `GET /api/stations/{id}/summary/` | Última leitura de cada métrica |
+    | `GET /api/stations/{id}/series/?metric=level&hours=24` | Série temporal (1 a 72 h) |
+    | `GET /api/observations/` | Lista leituras com filtros e paginação |
 
-    ### Consulta de Observações Geológicas:
-    - **Listar observações** (`GET /api/observations/`) sem autenticação
-    - **Criar observações** (`POST /api/observations/`) com autenticação
-    - **Atualizar observações** (`PUT /api/observations/{id}/`) com autenticação
-    - **Excluir observações** (`DELETE /api/observations/{id}/`) com autenticação
+    ## Filtros e paginação
+    - **Estações:** `search`, `river`, `municipality`, `ordering`.
+    - **Observações:** `station`, `metric` (`level`/`rain`), `source`, `observed_after`, `observed_before`, `ordering` (`observed_at`, `value`).
+    - **Paginação:** 100 itens por página (`?page=2`).
 
-    > **Nota de Permissão:** Qualquer usuário autenticado pode criar, atualizar ou excluir registros usando seu Token
+    ## Regras de negócio
+    - Horários sempre em **UTC** (ISO 8601).
+    - Nível em **m** e chuva em **mm/h**, nunca misturados.
+    - A janela de `series` é contada a partir da **última leitura** da estação.
+    - Leituras ausentes **não são preenchidas** nem interpoladas.
+    - Não pode haver duas leituras da mesma estação, métrica e instante.
     """),
     'VERSION': '1.0.0',
+    'CONTACT': {'name': 'Equipe HidroMonitor — Desafio Cogmo Technology'},
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
+    'TAGS': [
+        {'name': 'stations', 'description': 'Estações de medição: cadastro, resumo e séries temporais.'},
+        {'name': 'observations', 'description': 'Leituras de nível (m) e chuva (mm/h) de cada estação.'},
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayRequestDuration': True,
+        'filter': True,
+        'docExpansion': 'list',
+        'defaultModelsExpandDepth': 0,
+        'tryItOutEnabled': True,
+        'syntaxHighlight': {'theme': 'agate'},
+    },
+    'REDOC_UI_SETTINGS': {
+        'expandResponses': '200,201',
+        'pathInMiddlePanel': True,
+        'requiredPropsFirst': True,
+        'scrollYOffset': 64,
+        'hideHostname': False,
+        'theme': {
+            'colors': {'primary': {'main': '#1470d6'}, 'success': {'main': '#14a35a'}, 'error': {'main': '#d33a3a'}, 'warning': {'main': '#d98a00'}},
+            'typography': {
+                'fontSize': '15px', 'lineHeight': '1.7',
+                'fontFamily': "'Plus Jakarta Sans', system-ui, sans-serif",
+                'headings': {'fontFamily': "'Plus Jakarta Sans', system-ui, sans-serif", 'fontWeight': '800'},
+                'code': {'fontFamily': "'JetBrains Mono', ui-monospace, Consolas, monospace", 'fontSize': '13px', 'color': '#0a2a5e', 'backgroundColor': '#e6f1fd'},
+                'links': {'color': '#1470d6'},
+            },
+            'sidebar': {'width': '290px', 'backgroundColor': '#061a3f', 'textColor': '#cfe3fa', 'activeTextColor': '#ffffff', 'groupItems': {'textTransform': 'none'}},
+            'spacing': {'sectionVertical': 28, 'sectionHorizontal': 36, 'unit': 5},
+            'rightPanel': {'backgroundColor': '#0a1c3d', 'textColor': '#d4e8ff', 'width': '38%'},
+            'schema': {'nestedBackground': '#f6faff', 'typeNameColor': '#7a4fd1', 'typeTitleColor': '#7a4fd1'},
+            'codeBlock': {'backgroundColor': '#0a1c3d'},
+        },
+    },
 }
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None

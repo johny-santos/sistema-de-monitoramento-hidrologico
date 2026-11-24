@@ -1,0 +1,43 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    {% block head %}
+    <title>API · HidroMonitor — Swagger UI</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{% static 'monitoring/favicon.svg' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="{{ swagger_ui_css }}">
+    <link rel="stylesheet" href="{% static 'monitoring/docs.css' %}">
+    {% endblock head %}
+  </head>
+  <body class="hm-swagger">
+    {% block body %}
+    {% include "monitoring/docs_header.html" with current="swagger" %}
+    <section class="hm-intro">
+      <div>
+        <span class="hm-eyebrow">Documentação interativa</span>
+        <h1>API de Monitoramento Hidrológico</h1>
+        <p>Explore e teste cada rota direto no navegador. A leitura é pública; para criar, editar ou excluir, clique em <b>Authorize</b> e informe seu token.</p>
+      </div>
+      <ol class="hm-steps">
+        <li><b>1</b><span>Gere o token em <code>POST /api/token/</code></span></li>
+        <li><b>2</b><span>Clique em <em>Authorize</em> e cole <code>Token &lt;chave&gt;</code></span></li>
+        <li><b>3</b><span>Use <em>Try it out</em> em qualquer rota</span></li>
+      </ol>
+    </section>
+    <div id="swagger-ui"></div>
+    <script src="{{ swagger_ui_bundle }}"></script>
+    <script src="{{ swagger_ui_standalone }}"></script>
+    {% if script_url %}
+    <script src="{{ script_url }}"></script>
+    {% else %}
+    <script>
+    {% include template_name_js %}
+    </script>
+    {% endif %}
+    {% endblock %}
+  </body>
+</html>

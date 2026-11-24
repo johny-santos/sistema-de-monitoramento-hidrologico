@@ -1,0 +1,15 @@
+{% load static %}
+<header class="hm-top">
+  <a class="hm-logo" href="/" title="Voltar ao site">
+    <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hmg" x1="0" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#8fe0ff"/><stop offset=".55" stop-color="#2aa0f2"/><stop offset="1" stop-color="#0b5ac2"/></linearGradient></defs><path d="M32 3C32 3 11 26 11 41a21 21 0 0 0 42 0C53 26 32 3 32 3z" fill="url(#hmg)"/><path d="M17 44c5-4 10 4 15 0s10 4 15 0" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" opacity=".92"/></svg>
+    <span><b>HidroMonitor</b><small>Documentação da API</small></span>
+  </a>
+  <nav>
+    <a href="/">Site</a>
+    <a href="/api/docs/" {% if current == "swagger" %}class="on"{% endif %}>Swagger UI</a>
+    <a href="/api/redoc/" {% if current == "redoc" %}class="on"{% endif %}>Redoc</a>
+    <a href="/api/">API</a>
+    <a href="/api/schema/">Schema</a>
+    <a href="/admin/">Admin</a>
+  </nav>
+</header>

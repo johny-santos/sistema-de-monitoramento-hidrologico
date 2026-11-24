@@ -1,5 +1,7 @@
-Django
-django-filter
-djangorestframework
-drf-spectacular
-drf-spectacular-sidecar
+# Versões testadas (Python 3.12). Instale com: pip install -r utilities/requirements.txt
+Django==6.1.3
+djangorestframework==3.18.3
+django-filter==26.2
+drf-spectacular==0.30.0
+drf-spectacular-sidecar==2026.10.1
+PyYAML==6.0.3

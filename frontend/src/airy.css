@@ -1,0 +1,240 @@
+/* Camada de espaçamento e ritmo vertical: mais respiro, grades que se reorganizam por largura.
+   Carregada por último; sobrescreve o que for necessário de index.css e features.css. */
+
+:root {
+  --gap: 28px;
+  --pad: 30px;
+  --radius: 24px;
+  --sidebar: 244px;
+}
+
+html { scroll-behavior: smooth; }
+body { line-height: 1.55; text-rendering: optimizeLegibility; font-feature-settings: 'cv11', 'ss01'; }
+h1, h2, h3, h4 { line-height: 1.25; }
+:focus-visible { outline: 3px solid rgba(29, 127, 224, 0.45); outline-offset: 2px; border-radius: 10px; }
+* { scrollbar-width: thin; scrollbar-color: #b9d3ee transparent; }
+
+/* ---------- Estrutura ---------- */
+.shell, .shell.is-collapsed { transition: grid-template-columns 0.35s ease; }
+.shell { grid-template-columns: var(--sidebar) 1fr; }
+.shell.is-collapsed { grid-template-columns: 92px 1fr; }
+.content { padding: clamp(24px, 3vw, 44px) clamp(24px, 3.4vw, 52px) 64px; }
+.page { max-width: 1480px; display: flex; flex-direction: column; gap: var(--gap); }
+.page > * { margin-bottom: 0 !important; }
+
+/* Foto lateral só em telas largas (em notebooks ela invade o conteúdo) */
+@media (max-width: 1499px) { .bg::before { display: none; } }
+@media (min-width: 1500px) { :root { --sidebar: 268px; } .content { padding-right: 120px; } }
+
+/* ---------- Sidebar ---------- */
+.sidebar { padding: 38px 18px; }
+.brand { margin-bottom: 50px; }
+.brand p { margin-top: 8px; line-height: 1.5; }
+nav { gap: 10px; }
+.nav-link { padding: 15px 20px; }
+.side-bottom { gap: 14px; margin-bottom: 100px; }
+.side-user { padding: 14px; gap: 12px; }
+.side-docs { padding: 12px 16px; }
+
+/* ---------- Cabeçalho da página ---------- */
+.topbar { padding: 26px 34px; gap: 22px; }
+.hello { gap: 20px; }
+.hello-icon { width: 60px; height: 60px; }
+.hello h2 { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 1.05rem; font-weight: 500; color: #3d5678; }
+.hello h2 b { font-size: 1.55rem; line-height: 1.2; color: var(--ink); letter-spacing: -0.025em; }
+.hello h2 .badge.inline { margin-top: 2px; }
+.hello p { margin-top: 10px; font-size: 0.95rem; line-height: 1.5; }
+.top-right { gap: 16px; }
+
+/* ---------- KPIs ---------- */
+.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); }
+.kpi { padding: 30px 32px; gap: 22px; min-height: 128px; }
+.kpi strong { font-size: 2.25rem; margin-bottom: 6px; line-height: 1.05; }
+.kpi span { display: block; line-height: 1.45; font-size: 0.95rem; }
+.kpi-icon { width: 64px; height: 64px; }
+.kpi.kpi-sim strong { font-size: 1.3rem; margin-bottom: 8px; }
+.kpis.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1760px) { .kpis:not(.two) { grid-template-columns: 1.05fr 1fr 1fr 1.25fr; } }
+@media (max-width: 760px) { .kpis, .kpis.two { grid-template-columns: 1fr; } }
+
+/* ---------- Dashboard: gráficos + estação selecionada ---------- */
+.grid-dash { gap: var(--gap); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.card { padding: var(--pad); }
+.card-title { margin-bottom: 26px; font-size: 1.08rem; gap: 10px; }
+@media (min-width: 1760px) { .grid-dash { grid-template-columns: 1.4fr 1.4fr 0.95fr; } }
+
+/* Notebook: o card da estação vira faixa horizontal ocupando a linha toda */
+.card.selected { padding: var(--pad); }
+@media (max-width: 1759px) {
+  .card.selected {
+    grid-column: 1 / -1; display: grid; grid-template-columns: minmax(260px, 0.9fr) 1.1fr; column-gap: 40px; align-items: center;
+  }
+  .card.selected .card-title { grid-column: 1 / -1; }
+  .card.selected .sel-photo { grid-row: 2 / span 4; height: 230px; margin: 0; }
+  .card.selected h4, .card.selected .loc, .card.selected .sel-actions { grid-column: 2; }
+  .card.selected .loc { margin: 8px 0 26px; padding: 0; }
+}
+.sel-photo { height: 170px; margin-bottom: 22px; border-radius: 18px; }
+.card.selected h4 { font-size: 1.2rem; }
+.card.selected .loc { margin: 8px 0 auto; padding-bottom: 22px; }
+.sel-actions { gap: 18px; }
+@media (max-width: 760px) {
+  .card.selected { display: flex; }
+  .card.selected .sel-photo { height: 180px; margin-bottom: 20px; }
+}
+
+/* ---------- Estações ---------- */
+.filters { padding: 24px 30px; gap: 22px; }
+.filters-title { padding-right: 10px; }
+.cards { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 32px; }
+.station-card { padding: 20px 20px 24px; border-radius: 26px; }
+.station-card .photo { height: 215px; border-radius: 18px; margin-bottom: 22px; }
+.station-card h3 { font-size: 1.18rem; padding: 0 6px; margin-bottom: 2px; }
+.station-card .loc { margin: 10px 0 14px; padding: 0 6px; font-size: 0.93rem; line-height: 1.45; }
+.station-card .badge { padding: 0 6px; margin-bottom: 24px; display: flex; }
+.chips-row { gap: 10px; }
+.foot { margin-top: 4px; }
+.empty { padding: 64px 24px; gap: 10px; }
+
+/* ---------- Observações ---------- */
+.filters.wrap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 26px; align-items: end; padding: 26px 30px; }
+.filters.wrap .filters-title { grid-column: 1 / -1; }
+.filters.wrap .push { grid-column: 1 / -1; justify-self: end; margin: 0; }
+.filters.wrap .field .seg { width: 100%; }
+.filters.wrap .field .seg button { flex: 1; padding: 8px 10px; }
+.filters.wrap .select select, .filters.wrap .input[type='datetime-local'] { min-width: 0; }
+@media (min-width: 1560px) {
+  .filters.wrap { grid-template-columns: auto 1.2fr minmax(250px, auto) 1fr 1fr 1fr; }
+  .filters.wrap .filters-title { grid-column: auto; align-self: center; }
+}
+@media (max-width: 760px) { .filters.wrap { grid-template-columns: 1fr; } }
+
+.table-card { padding: 30px; }
+.table-head { margin-bottom: 6px; }
+.table { font-size: 0.95rem; }
+.table thead th { padding: 17px 22px; }
+.table td { padding: 17px 22px; line-height: 1.45; }
+.table td small { display: block; margin-top: 2px; }
+.table td.num small { display: inline; margin-left: 4px; }
+.pager { padding: 22px 6px 4px; gap: 16px; }
+.mtag { padding: 6px 13px; }
+
+/* ---------- Detalhe da estação ---------- */
+.seg { padding: 6px; gap: 6px; }
+.seg button { padding: 10px 22px; }
+.card.big { padding: 34px; }
+.tabs { gap: 12px; margin-bottom: 28px; }
+.tabs button { padding: 12px 22px; }
+.tabs .meta { line-height: 1.5; }
+.delta { padding: 8px 14px; }
+
+/* ---------- Sobre ---------- */
+.warn { padding: 24px 30px; gap: 18px; }
+.warn p { margin-top: 6px; line-height: 1.6; }
+.about-grid { gap: var(--gap); margin-bottom: 0; }
+.about h3 { margin: 22px 0 10px; }
+.about p { line-height: 1.7; }
+.routes { gap: 16px; }
+.routes li { line-height: 1.7; }
+.doc-links { gap: 20px; }
+.doc-links a { padding: 20px 22px; row-gap: 2px; }
+.about-team { margin-bottom: 0 !important; }
+.credits { margin-top: 0 !important; line-height: 1.7; }
+
+/* ---------- Estados, modal, formulários ---------- */
+.state { padding: 64px 24px; gap: 14px; line-height: 1.6; }
+.modal { padding: 34px; }
+.modal header { margin-bottom: 26px; }
+.form { gap: 22px; }
+.form-note { padding: 16px 18px; line-height: 1.65; }
+.form-row { gap: 18px; }
+.field { gap: 8px; }
+.form-error { line-height: 1.5; padding: 14px 16px; }
+
+/* ---------- Telas pequenas ---------- */
+@media (max-width: 760px) {
+  :root { --gap: 20px; --pad: 22px; }
+  .topbar { padding: 20px; }
+  .hello h2 b { font-size: 1.3rem; }
+  .content { padding: 20px 16px 48px; }
+  .cards { grid-template-columns: 1fr; gap: 24px; }
+  .table-card { padding: 20px 16px; }
+  .table td, .table thead th { padding: 14px 14px; }
+}
+
+/* ---------- Ajustes finos ---------- */
+.cards { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
+.side-user .who small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar { overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+.sidebar::-webkit-scrollbar { display: none; }
+/* Telas baixas (notebooks 768px): compacta só a sidebar para nada se sobrepor */
+@media (max-height: 860px) {
+  .sidebar { padding-top: 26px; }
+  .brand { margin-bottom: 30px; }
+  .brand-drop { width: 56px; height: 56px; margin-bottom: 8px; }
+  .brand-drop svg { width: 56px; height: 56px; }
+  .brand h1 { font-size: 1.35rem; }
+  nav { gap: 6px; }
+  .nav-link { padding: 12px 18px; }
+  .side-bottom { gap: 10px; margin-bottom: 92px; margin-top: 24px; }
+}
+
+/* ================= 3D ================= */
+.canvas-wrap { position: relative; width: 100%; contain: layout paint; border-radius: 20px; overflow: hidden; background: linear-gradient(180deg, #0b2a5b, #0a1c3d); isolation: isolate; }
+.canvas-wrap canvas { display: block; width: 100% !important; height: 100% !important; touch-action: pan-y; cursor: grab; }
+.canvas-wrap canvas:active { cursor: grabbing; }
+.fallback3d { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 220px; border-radius: 20px; color: var(--muted); background: repeating-linear-gradient(135deg, #eef5fd, #eef5fd 14px, #e8f1fb 14px, #e8f1fb 28px); text-align: center; padding: 24px; }
+.fallback3d svg { color: var(--blue-400); }
+
+.card.world { padding: var(--pad); }
+.world-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.world-head .card-title { margin-bottom: 18px; }
+.hint { font-size: 0.8rem; color: var(--muted); margin-bottom: 18px; }
+.world-legend { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 18px; font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+.world-legend .sim { margin-left: auto; font-weight: 500; }
+.lg { display: inline-block; width: 11px; height: 11px; margin-right: 8px; border-radius: 3px; transform: rotate(45deg); vertical-align: -1px; }
+.lg.pin { background: #38bdf8; } .lg.sel { background: #ffd24a; } .lg.rain { background: #cfe6ff; border: 1px solid #8fb8e0; border-radius: 50%; transform: none; }
+
+.pin-label { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 12px; border-radius: 12px; white-space: nowrap; color: #fff; background: rgba(6, 26, 63, 0.82); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+.pin-label b { font-size: 12px; font-weight: 700; } .pin-label span { font-size: 11px; color: #9fd0ff; font-variant-numeric: tabular-nums; }
+.pin-label.on { background: rgba(255, 196, 40, 0.95); color: #3a2a00; border-color: #fff4c9; } .pin-label.on span { color: #6b4b00; }
+
+.gauge-tick { font-size: 11px; font-weight: 700; color: #bcd9f7; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gauge-tick.light { color: #9fc4ee; }
+.gauge-value { padding: 6px 14px; border-radius: 12px; font-size: 20px; font-weight: 800; color: #fff; background: rgba(6, 26, 63, 0.7); border: 1px solid rgba(143, 208, 255, 0.45); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gauge-value small { font-size: 12px; font-weight: 600; color: #9fd0ff; }
+.tip3d { display: flex; flex-direction: column; align-items: center; padding: 7px 13px; border-radius: 12px; color: #fff; background: rgba(6, 26, 63, 0.92); border: 1px solid rgba(143, 208, 255, 0.4); white-space: nowrap; }
+.tip3d small { font-size: 10px; color: #8fcbff; font-weight: 600; } .tip3d b { font-size: 14px; }
+.hint3d { position: absolute; left: 16px; bottom: 12px; font-size: 11px; color: rgba(190, 220, 250, 0.8); pointer-events: none; }
+
+.detail-top { display: grid; grid-template-columns: minmax(280px, 0.8fr) 1.2fr; gap: var(--gap); align-items: stretch; }
+.gauge-card { display: flex; flex-direction: column; }
+.gauge-card .card-title { margin-bottom: 18px; }
+.gauge-card .fallback3d { flex: 1; min-height: 300px; }
+.kpis.stack { grid-template-columns: 1fr; align-content: stretch; }
+.kpis.stack .kpi { height: 100%; }
+@media (max-width: 1100px) { .detail-top { grid-template-columns: 1fr; } }
+.seg.mode { margin-left: auto; padding: 4px; } .seg.mode button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; }
+.tabs .meta { margin-left: 0; flex-basis: 100%; }
+@media (min-width: 1100px) { .tabs .meta { flex-basis: auto; margin-left: 18px; } }
+
+/* inclinação 3D por perspectiva (cartões de estação) */
+.tilt { transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.18s ease-out; transform-style: preserve-3d; }
+.tilt:hover { z-index: 2; }
+@media (prefers-reduced-motion: reduce) { .tilt { transform: none !important; } }
+
+/* ---------- Desempenho ---------- */
+/* Cartões abaixo da dobra só são pintados quando chegam perto da tela. */
+.page > .card, .page > section.card { content-visibility: auto; contain-intrinsic-size: auto 480px; }
+.card.world, .card.big { content-visibility: visible; }
+/* Inclinação 3D só enquanto o mouse está em cima. */
+.tilt:hover { will-change: transform; }
+/* Transições específicas (em vez de "all"). */
+.nav-link, .btn-dark, .btn-primary, .btn-ghost, .icon-btn { transition-property: transform, background-color, box-shadow, color, border-color, filter; }
+.hint.tight { margin: 14px 0 0; }
+.qtoggle { display: inline-flex; align-items: center; gap: 4px; padding: 4px; margin-bottom: 18px; border-radius: 12px; background: #eaf2fb; color: var(--muted); }
+.qtoggle svg { margin: 0 4px 0 8px; }
+.qtoggle button { border: 0; cursor: pointer; padding: 6px 13px; border-radius: 9px; font-size: 0.78rem; font-weight: 700; color: var(--muted); background: transparent; transition: background-color 0.15s, color 0.15s; }
+.qtoggle button.on { background: var(--blue-500); color: #fff; }
+.qtoggle button:not(.on):hover { color: var(--blue-600); }
+.world-head, .gauge-card .card-title { gap: 12px; }
