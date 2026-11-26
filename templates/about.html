@@ -1,18 +1,57 @@
-
 {% extends 'base.html' %}
 
-{% block title %}Sobre Nós | HydroMonitor{% endblock %}
+{% block title %}Sobre o projeto | HydroMonitor{% endblock %}
 
 {% block page_heading %}
-    Informações Gerais sobre o projeto e EndPoints
+    Informações gerais sobre o projeto e endpoints
 {% endblock %}
 
 {% block content %}
 
     <div class="container-fluid">
-        <h2>Aqui vamos colocar os links dos EndPoints da API</h2>
 
-        <p>Vamos colocar todos os EndPoints poissíveis.</p>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5>HydroMonitor</h5>
+                <p class="mb-0">
+                    Sistema de monitoramento hidrológico acadêmico, feito com Python e Django. Exibe estações,
+                    observações de nível do rio (m) e precipitação (mm/h) por meio de gráficos.
+                    Os dados são sintéticos e servem apenas para demonstração.
+                </p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5>Endpoints da API</h5>
+                <p class="text-muted">As consultas (GET) são públicas. Criar, alterar e excluir exige autenticação.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead><tr><th>Método</th><th>Rota</th><th>Descrição</th></tr></thead>
+                        <tbody>
+                            <tr><td>GET</td><td><a href="/api/">/api/</a></td><td>Raiz da API</td></tr>
+                            <tr><td>GET</td><td><a href="/api/stations/">/api/stations/</a></td><td>Lista as estações (filtros <code>river</code>, <code>municipality</code>; <code>search</code>)</td></tr>
+                            <tr><td>GET</td><td><code>/api/stations/{id}/</code></td><td>Detalhe de uma estação, como <a href="/api/stations/EST-01/">EST-01</a></td></tr>
+                            <tr><td>GET</td><td><code>/api/stations/{id}/summary/</code></td><td>Estação, total de observações e última leitura de cada métrica (<a href="/api/stations/EST-01/summary/">exemplo</a>)</td></tr>
+                            <tr><td>GET</td><td><code>/api/stations/{id}/series/</code></td><td>Série histórica: <code>metric</code> (<code>level</code> ou <code>rain</code>) e <code>hours</code> (1 a 720) (<a href="/api/stations/EST-01/series/?metric=level&amp;hours=24">exemplo</a>)</td></tr>
+                            <tr><td>GET</td><td><a href="/api/observations/">/api/observations/</a></td><td>Lista as observações (filtros <code>station</code>, <code>metric</code>, <code>source</code>, <code>observed_after</code>, <code>observed_before</code>; <code>ordering</code>)</td></tr>
+                            <tr><td>GET</td><td><code>/api/observations/{id}/</code></td><td>Detalhe de uma observação</td></tr>
+                            <tr><td>POST, PUT, PATCH, DELETE</td><td><code>/api/stations/</code> e <code>/api/observations/</code></td><td>Escrita, com token ou sessão</td></tr>
+                            <tr><td>POST</td><td><code>/api/token/</code></td><td>Obtém o token de autenticação</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Documentação</h5>
+                <a class="btn btn-outline-primary btn-sm me-2" href="/api/docs/">Swagger UI</a>
+                <a class="btn btn-outline-primary btn-sm me-2" href="/api/redoc/">ReDoc</a>
+                <a class="btn btn-outline-primary btn-sm" href="/api/schema/">Schema OpenAPI</a>
+            </div>
+        </div>
 
     </div>
 
