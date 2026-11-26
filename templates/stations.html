@@ -1,5 +1,5 @@
-
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Estações | HydroMonitor{% endblock %}
 
@@ -10,12 +10,16 @@
 {% block content %}
 
     <div class="container-fluid">
-        <h2>Aqui você vai ver todas as estações</h2>
+        <p class="text-muted">Escolha uma estação para ver detalhes e informações de uma estação específica.</p>
 
-        <p>Escolha uma estação para ver detalhes e informações de uma estação específica</p>
-
-        <!--Aqui terão os cards com uma foto fictícia de cada estação, nome uma breve descrição um botão de ver detalhes da estação. -->
-
+        <div class="row g-3" id="stations-grid">
+            <div class="col-12 text-muted">Carregando estações…</div>
+        </div>
     </div>
 
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/hidro.js' %}"></script>
+    <script src="{% static 'js/stations.js' %}"></script>
 {% endblock %}

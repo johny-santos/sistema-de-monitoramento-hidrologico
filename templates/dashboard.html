@@ -1,5 +1,5 @@
-
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dashboard | HydroMonitor{% endblock %}
 
@@ -10,12 +10,59 @@
 {% block content %}
 
     <div class="container-fluid">
-        <h2>Bem-vindo ao HydroMonitor</h2>
+        <p class="text-muted">Acompanhe as informações das estações de monitoramento hidrológico.</p>
 
-        <p>Acompanhe as informações das estações de monitoramento hidrológico.</p>
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card shadow-sm"><div class="card-body">
+                    <small class="text-muted">Estações</small>
+                    <h3 class="mb-0" id="total-estacoes">…</h3>
+                </div></div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card shadow-sm"><div class="card-body">
+                    <small class="text-muted">Observações registradas</small>
+                    <h3 class="mb-0" id="total-observacoes">…</h3>
+                </div></div>
+            </div>
+        </div>
 
-        <!-- Os indicadores e gráficos entrarão aqui -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <h5 class="mb-0">Comparação do nível do rio entre estações</h5>
+                    <select id="filtro-horas" class="form-select form-select-sm w-auto" aria-label="Janela de tempo">
+                        <option value="24">Últimas 24 h</option>
+                        <option value="72" selected>Últimas 72 h</option>
+                        <option value="168">Últimos 7 dias</option>
+                        <option value="720">Últimos 30 dias</option>
+                    </select>
+                </div>
+                <div id="sem-dados" class="alert alert-info d-none">Não há observações de nível disponíveis para o período.</div>
+                <div id="area-grafico" style="position: relative; height: 380px;">
+                    <canvas id="grafico"></canvas>
+                </div>
+                <small class="text-muted">A janela é contada a partir da última leitura de cada estação.</small>
+            </div>
+        </div>
 
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Última leitura por estação</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead><tr><th>Estação</th><th>Rio</th><th>Nível</th><th>Chuva</th></tr></thead>
+                        <tbody id="tabela-estacoes"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+    <script src="{% static 'js/hidro.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
