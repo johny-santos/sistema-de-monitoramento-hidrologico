@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('total-estacoes').textContent = resumos.length;
         document.getElementById('total-observacoes').textContent =
             resumos.reduce((soma, r) => soma + r.observations_count, 0);
+        document.getElementById('cards-estacoes').innerHTML = resumos.map((r, i) => Hidro.cardEstacao(r, i)).join('');
         document.getElementById('tabela-estacoes').innerHTML = resumos.map((r) => {
             const n = r.latest.level, c = r.latest.rain;
             return '<tr><td><a href="/station/' + r.id + '/">' + r.name + '</a></td><td>' + r.river + '</td><td>' +

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" role="img" aria-label="Ilustração fictícia de estação junto a um rio">
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#e0f2fe"/></linearGradient></defs>
+  <rect width="400" height="200" fill="url(#c)"/>
+  <circle cx="320" cy="48" r="22" fill="#fde68a"/>
+  <path d="M0 120 L90 70 L170 115 L250 60 L400 125 L400 200 L0 200Z" fill="#86efac"/>
+  <path d="M0 150 Q50 135 100 150 T200 150 T300 150 T400 150 L400 200 L0 200Z" fill="#2563eb"/>
+  <path d="M0 172 Q50 160 100 172 T200 172 T300 172 T400 172 L400 200 L0 200Z" fill="#1d4ed8"/>
+  <rect x="60" y="92" width="6" height="58" fill="#334155"/>
+  <rect x="42" y="82" width="42" height="18" rx="3" fill="#102a43"/>
+  <circle cx="63" cy="91" r="4" fill="#38bdf8"/>
+</svg>
